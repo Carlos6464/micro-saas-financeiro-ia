@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/api-gateway"
+    },
+    {
+      "path": "./apps/auth"
+    },
+    {
+      "path": "./apps/users"
+    },
+    {
+      "path": "./apps/finance"
+    },
+    {
+      "path": "./libs/common"
+    },
+    {
+      "path": "./libs/contracts"
+    },
+    {
+      "path": "./libs/database"
+    }
+  ]
+}
