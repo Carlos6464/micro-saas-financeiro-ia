@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { HashingService } from '../hashing/hashing.service';
 import { Tokens, JwtPayload } from '../interfaces/token.interface';
-// CORREÇÃO AQUI: import type
 import type { IUsersRepository } from '../../users/repositories/users.repository.interface';
 
 @Injectable()

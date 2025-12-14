@@ -1,60 +1,37 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config'; // 1. Adicione ConfigService
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { BackendDatabaseModule } from '@backend/database';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-// Auth Imports
-import { AuthController } from './auth/auth.controller';
-import { RegisterUserUseCase } from './auth/use-cases/register-user.usecase';
-import { LoginUseCase } from './auth/use-cases/login.usecase';
-import { RefreshTokenUseCase } from './auth/use-cases/refresh-token.usecase';
-import { HashingService } from './auth/hashing/hashing.service';
-import { JwtStrategy } from './auth/strategies/jwt.strategy';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+// Modules
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
-// User Imports
-import { UserEntity } from './users/entities/user.entity';
-import { UsersRepository } from './users/repositories/users.repository';
+// Guard Global
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
+    // 1. Configurações Globais
     ConfigModule.forRoot({ isGlobal: true }),
+    
+    // 2. Banco de Dados
     BackendDatabaseModule.forRoot('DB_NAME_AUTH'),
-    TypeOrmModule.forFeature([UserEntity]),
     
-    
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.getOrThrow('JWT_SECRET'), // Agora ele pega a chave do .env
-        signOptions: { expiresIn: '1d' }, // Opcional: define validade padrão
-      }),
-    }),
+    // 3. Módulos de Funcionalidade
+    UsersModule, // Gerencia Entidades e CRUD de usuário
+    AuthModule,  // Gerencia Login, Tokens e Estratégias
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController],
   providers: [
     AppService,
-    HashingService,
-    // Use Cases
-    RegisterUserUseCase,
-    LoginUseCase,
-    RefreshTokenUseCase,
-    // Security
-    JwtStrategy,
+    // Mantemos o Guard Global aqui para proteger a aplicação inteira
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    },
-    // Repository
-    {
-      provide: 'IUsersRepository',
-      useClass: UsersRepository,
     },
   ],
 })

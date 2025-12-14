@@ -13,6 +13,8 @@ import { HttpExceptionFilter, TransformInterceptor } from '@backend/common';
 import { WinstonModule} from 'nest-winston'
 import { winstonConfig} from '@backend/common'
 
+
+
 async function bootstrap() {
   
   const app = await NestFactory.create(AppModule, {
@@ -29,6 +31,8 @@ async function bootstrap() {
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
   );
+  
+  
 }
 
 bootstrap();
