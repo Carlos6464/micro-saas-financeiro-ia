@@ -1,22 +1,28 @@
 version: '3.8'
 
 services:
-  mysql:
+  db: # Mudei o nome do serviço para 'db' (mais padrão)
     image: mysql:8.0
-    container_name: finance_mysql
+    container_name: micro_saas_db # Nome genérico (guarda Auth e Finance)
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      # Ajuste: Verifique se no seu .env está DB_PASSWORD ou DB_PASS
+      # Vamos usar DB_PASSWORD que é o padrão do NestJS
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      
+      # IMPORTANTE: NÃO defina MYSQL_DATABASE aqui.
+      # Deixamos o init.sql criar os bancos (despesas_auth e despesas_finance)
     ports:
       - '${DB_PORT}:3306'
     volumes:
       - mysql_data:/var/lib/mysql
+      # Garante que o script de criação dos bancos seja executado na inicialização
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
     command: --default-authentication-plugin=mysql_native_password
 
   redis:
     image: redis:alpine
-    container_name: finance_redis
+    container_name: micro_saas_redis
     ports:
       - '${REDIS_PORT}:6379'
 

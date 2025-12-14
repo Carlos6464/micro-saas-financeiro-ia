@@ -56,24 +56,14 @@
         "executor": "nx:noop"
       },
       "serve": {
-        "continuous": true,
-        "executor": "@nx/js:node",
-        "defaultConfiguration": "development",
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "node dist/main.js",
+          "cwd": "apps/api-gateway"
+        },
         "dependsOn": [
           "build"
-        ],
-        "options": {
-          "buildTarget": "@backend/api-gateway:build",
-          "runBuildTargetDependencies": false
-        },
-        "configurations": {
-          "development": {
-            "buildTarget": "@backend/api-gateway:build:development"
-          },
-          "production": {
-            "buildTarget": "@backend/api-gateway:build:production"
-          }
-        }
+        ]
       },
       "test": {
         "options": {
@@ -86,6 +76,7 @@
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "http-proxy-middleware": "^3.0.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
     "tslib": "^2.3.0"

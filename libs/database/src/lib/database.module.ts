@@ -21,8 +21,8 @@ export class BackendDatabaseModule {
             type: 'mysql',
             host: configService.get<string>('DB_HOST'),
             port: configService.get<number>('DB_PORT'),
-            username: configService.get<string>('DB_USER'),
-            password: configService.get<string>('DB_PASS'),
+            username: configService.get<string>('DB_USERNAME'),
+            password: configService.get<string>('DB_PASSWORD'),
             database: configService.get<string>(dbNameEnvVar),
             autoLoadEntities: true,
             synchronize: true, // DEV only

@@ -1,38 +1,52 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
-import { Logger } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app/app.module';
 
-import { HttpExceptionFilter, TransformInterceptor } from '@backend/common';
+// Libs compartilhadas (Padronização)
+import { HttpExceptionFilter, TransformInterceptor, winstonConfig } from '@backend/common';
+import { WinstonModule } from 'nest-winston';
 
-import { WinstonModule} from 'nest-winston'
-import { winstonConfig} from '@backend/common'
-
-
+declare const module: any;
 
 async function bootstrap() {
-  
+  // 1. Cria a app com Logger customizado (Winston)
   const app = await NestFactory.create(AppModule, {
-    logger: WinstonModule.createLogger(winstonConfig)
+    logger: WinstonModule.createLogger(winstonConfig),
   });
 
+  // 2. Configurações Globais
   const globalPrefix = 'api/v1';
   app.setGlobalPrefix(globalPrefix);
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(new TransformInterceptor());
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
-  Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+  
+  app.useGlobalPipes(
+    new ValidationPipe({ 
+      whitelist: true, 
+      forbidNonWhitelisted: true, 
+      transform: true 
+    })
   );
   
-  
+  // Padroniza erros e formato de resposta (data: {})
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalInterceptors(new TransformInterceptor());
+
+  // Permite fechar conexões graciosamente no reload
+  app.enableShutdownHooks(); 
+
+  // 3. Porta: Usa variável AUTH_PORT ou 3001
+  const port = process.env.AUTH_PORT || 3001;
+  await app.listen(port);
+
+  Logger.log(
+    `🚀 Auth Service is running on: http://localhost:${port}/${globalPrefix}`
+  );
+
+  // 4. Hot Module Replacement (Recarregamento rápido)
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
 }
 
 bootstrap();
