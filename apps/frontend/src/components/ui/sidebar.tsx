@@ -5,12 +5,10 @@ import { usePathname } from 'next/navigation';
 import { 
   Wallet, 
   LayoutDashboard, 
-  ArrowRightLeft, 
-  PieChart, 
-  CreditCard, 
-  Settings, 
+  ArrowRightLeft,
   LifeBuoy, 
-  LogOut 
+  LogOut, 
+  Tag
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/store/auth-store'; // Assumindo que você tem isso do login
@@ -22,6 +20,7 @@ export function Sidebar() {
   const menuItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Transações', href: '/transactions', icon: ArrowRightLeft },
+    { name: 'Categorias', href: '/categories', icon: Tag },
   ];
 
   return (
