@@ -16,8 +16,10 @@ async function bootstrap() {
   });
 
   // 2. Configurações Globais
-  const globalPrefix = 'api/v1';
-  app.setGlobalPrefix(globalPrefix);
+  // CORREÇÃO: Removemos o Global Prefix 'api/v1' daqui.
+  // O Gateway já processa esse prefixo. O serviço deve responder em /auth/register diretamente.
+  // const globalPrefix = 'api/v1';
+  // app.setGlobalPrefix(globalPrefix);
   
   app.useGlobalPipes(
     new ValidationPipe({ 
@@ -38,8 +40,9 @@ async function bootstrap() {
   const port = process.env.AUTH_PORT || 3001;
   await app.listen(port);
 
+  // Log ajustado para refletir a URL real do serviço interno
   Logger.log(
-    `🚀 Auth Service is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Auth Service is running on: http://localhost:${port}`
   );
 
   // 4. Hot Module Replacement (Recarregamento rápido)

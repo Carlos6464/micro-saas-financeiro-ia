@@ -9,7 +9,7 @@ import { AppService } from './app.service';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    JwtModule.register({}), // Registramos o módulo JWT para o middleware usar
+    JwtModule.register({}), 
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -19,13 +19,11 @@ export class AppModule implements NestModule {
     // ----------------------------------------------------
     // 1. APLICAR AUTENTICAÇÃO (AuthMiddleware)
     // ----------------------------------------------------
-    // Protege todas as rotas de Finanças e Usuários
     consumer
       .apply(AuthMiddleware)
       .forRoutes(
         { path: 'api/v1/finance/(.*)', method: RequestMethod.ALL },
         { path: 'api/v1/users/(.*)', method: RequestMethod.ALL } 
-        // Note: Não proteja 'api/v1/auth', pois é login/registro público
       );
 
     // ----------------------------------------------------
@@ -33,33 +31,50 @@ export class AppModule implements NestModule {
     // ----------------------------------------------------
     
     // --> Proxy para AUTH SERVICE (Login, Register) - Público
-    consumer
+   consumer
       .apply(
         createProxyMiddleware({
           target: `http://localhost:${process.env.AUTH_PORT || 3001}`,
           changeOrigin: true,
+          pathRewrite: (path) => {
+            console.log(`[Proxy Auth] Caminho recebido: ${path}`);
+            
+            // Se o caminho já vier "limpo" como /register, adicionamos /auth
+            if (!path.startsWith('/api/v1/auth')) {
+               return `/auth${path}`; 
+            }
+            
+            // Se vier completo, fazemos a substituição padrão
+            return path.replace('/api/v1/auth', '/auth');
+          },
         })
       )
       .forRoutes('api/v1/auth');
 
-    // --> Proxy para USERS (Profile) - Protegido (AuthMiddleware já rodou)
+    // --> Proxy para USERS (Profile) - Protegido
     consumer
       .apply(
         createProxyMiddleware({
           target: `http://localhost:${process.env.AUTH_PORT || 3001}`,
           changeOrigin: true,
+          pathRewrite: {
+            // CORREÇÃO: Remove /api/v1, mas mantém /users
+            // Ex: /api/v1/users/profile -> /users/profile
+            '^/api/v1/users': '/users',
+          },
         })
       )
       .forRoutes('api/v1/users');
 
-    // --> Proxy para FINANCE SERVICE - Protegido (AuthMiddleware já rodou)
+    // --> Proxy para FINANCE SERVICE - Protegido
     consumer
       .apply(
         createProxyMiddleware({
           target: `http://localhost:${process.env.FINANCE_PORT || 3002}`,
           changeOrigin: true,
           pathRewrite: {
-            '^/api/v1/finance': '', // Remove prefixo para o serviço
+            // Aqui removemos tudo porque o finance geralmente assume a raiz ou controller próprio
+            '^/api/v1/finance': '', 
           },
         })
       )
