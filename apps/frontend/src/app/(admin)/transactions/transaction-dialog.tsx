@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
-// Imports dos componentes UI
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -32,7 +31,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-// --- SCHEMA E TIPAGEM ---
 const transactionSchema = z.object({
   description: z.string().min(3, "A descrição deve ter pelo menos 3 caracteres"),
   amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
@@ -44,7 +42,6 @@ const transactionSchema = z.object({
   date: z.string(),
 })
 
-// Exportamos o tipo para a página usar
 export type TransactionFormValues = z.infer<typeof transactionSchema>
 
 interface TransactionDialogProps {
@@ -72,7 +69,6 @@ export function TransactionDialog({
     },
   })
 
-  // Preenche o formulário ao abrir para editar ou reseta para criar
   useEffect(() => {
     if (open) {
       if (initialData) {
@@ -100,7 +96,8 @@ export function TransactionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-slate-950 border-slate-800">
+      {/* CORREÇÃO AQUI: Classes para responsividade (w-[90%], rounded-xl, max-h) */}
+      <DialogContent className="w-[90%] sm:max-w-[500px] rounded-xl max-h-[90vh] overflow-y-auto bg-slate-950 border-slate-800">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-white">
             {initialData ? "Editar Transação" : "Nova Transação"}
@@ -242,7 +239,7 @@ export function TransactionDialog({
               )}
             />
 
-            <DialogFooter className="mt-6">
+            <DialogFooter className="mt-6 gap-2 sm:gap-0">
               <Button
                 type="button"
                 variant="outline"

@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
-// Componentes UI (caminhos absolutos pois estão em src/components/ui)
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -32,7 +31,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-// --- SCHEMA ---
 const categorySchema = z.object({
   name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),
   description: z.string().optional(),
@@ -63,7 +61,6 @@ export function CategoryDialog({
     },
   })
 
-  // Atualiza o formulário ao abrir/editar
   useEffect(() => {
     if (open) {
       if (initialData) {
@@ -85,7 +82,8 @@ export function CategoryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-slate-950 border-slate-800">
+      {/* CORREÇÃO AQUI: Classes para responsividade */}
+      <DialogContent className="w-[90%] sm:max-w-[500px] rounded-xl max-h-[90vh] overflow-y-auto bg-slate-950 border-slate-800">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-white">
             {initialData ? "Editar Categoria" : "Nova Categoria"}
@@ -159,7 +157,7 @@ export function CategoryDialog({
               )}
             />
 
-            <DialogFooter className="mt-6">
+            <DialogFooter className="mt-6 gap-2 sm:gap-0">
               <Button
                 type="button"
                 variant="outline"

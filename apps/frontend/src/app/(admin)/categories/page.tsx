@@ -37,6 +37,7 @@ import { Badge } from "@/components/ui/badge"
 
 // IMPORTAÇÃO LOCAL (mesma pasta)
 import { CategoryDialog, CategoryFormValues } from "./category-dialog"
+import { Header } from "@/components/ui/header"
 
 // --- TIPAGEM ---
 interface Category {
@@ -132,23 +133,12 @@ export default function CategoriesPage() {
   return (
     <div className="flex flex-col h-full">
       {/* HEADER DA PÁGINA */}
-      <div className="flex-none px-6 py-5 lg:px-10 border-b border-slate-800/50 bg-background/80 backdrop-blur-md sticky top-0 z-20 flex justify-between items-center">
-        <div>
-          <h2 className="text-white text-2xl lg:text-3xl font-bold tracking-tight">
-            Categorias
-          </h2>
-          <p className="text-muted-foreground text-sm mt-1">
-            Organize suas receitas e despesas.
-          </p>
-        </div>
-        <Button
-          onClick={handleOpenCreate}
-          className="bg-primary text-primary-foreground font-bold shadow-[0_0_20px_rgba(70,236,19,0.3)] hover:shadow-[0_0_30px_rgba(70,236,19,0.5)]"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Nova Categoria
-        </Button>
-      </div>
+      <Header 
+        title="Categorias"
+        subtitle="Organize suas receitas e despesas."
+        onAddTransaction={handleOpenCreate}
+        actionLabel="Nova Categoria"
+      />
 
       {/* CONTEÚDO SCROLLÁVEL */}
       <div className="flex-1 overflow-y-auto p-6 lg:p-10 scroll-smooth">

@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils';
 
 // --- SCHEMAS DE VALIDAÇÃO (ZOD) ---
 const authSchema = z.object({
-  name: z.string().optional(), // Apenas para registro
+  name: z.string().optional(),
   email: z.string().email('Insira um e-mail válido'),
   password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
 });
@@ -45,7 +45,6 @@ export default function AuthPage() {
     resolver: zodResolver(authSchema),
   });
 
-  // Função para trocar de aba e limpar erros
   const toggleMode = (newMode: 'login' | 'register') => {
     setMode(newMode);
     reset();
@@ -55,33 +54,24 @@ export default function AuthPage() {
     setIsLoading(true);
     try {
       if (mode === 'login') {
-        // --- LOGIN ---
         const response = await api.post('/auth/login', {
           email: data.email,
           password: data.password,
         });
         
-        // CORREÇÃO 1: Acessar response.data.data e usar o nome correto (accessToken)
-        // O Axios coloca o corpo em .data. O seu backend coloca o payload em .data.
         const { accessToken, refreshToken } = response.data.data;
-        
-        // Salva token (usando accessToken)
         loginFn(accessToken, { sub: 0, email: data.email }); 
-        
-        // Opcional: Salvar refreshToken no localStorage se precisar
         localStorage.setItem('refreshToken', refreshToken);
 
         toast.success(`Bem-vindo de volta!`);
         router.push('/dashboard');
 
       } else {
-        // --- REGISTRO ---
-        // CORREÇÃO 2: Rota correta conforme configuramos no Gateway/Auth Service
         await api.post('/auth/register', { 
            name: data.name || 'Usuário',
            email: data.email,
            password: data.password,
-           telefone: '00000000000' // Adicione se for obrigatório no backend, ou remova se opcional
+           telefone: '00000000000'
         });
 
         toast.success('Conta criada! Faça login para continuar.');
@@ -90,7 +80,6 @@ export default function AuthPage() {
       }
     } catch (error: any) {
       console.error(error);
-      // Tenta pegar a mensagem de erro formatada pelo seu ExceptionFilter
       const msg = error.response?.data?.message || 'Ocorreu um erro. Tente novamente.';
       toast.error(Array.isArray(msg) ? msg[0] : msg);
     } finally {
@@ -101,9 +90,8 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden font-sans">
       
-      {/* --- LADO ESQUERDO: VISUAL --- */}
+      {/* --- LADO ESQUERDO: VISUAL (Apenas Desktop) --- */}
       <div className="relative hidden lg:flex w-full lg:w-1/2 bg-card flex-col justify-between p-12 overflow-hidden border-r border-slate-800">
-        {/* Background Image & Effects */}
         <div className="absolute inset-0 z-0">
           <div 
             className="w-full h-full bg-cover bg-center opacity-40 mix-blend-overlay" 
@@ -113,7 +101,7 @@ export default function AuthPage() {
           <div className="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
         </div>
 
-        {/* Logo */}
+        {/* Logo Desktop */}
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-black shadow-[0_0_15px_rgba(70,236,19,0.3)]">
@@ -123,7 +111,6 @@ export default function AuthPage() {
           </div>
         </div>
 
-        {/* Texto Hero */}
         <div className="relative z-10 max-w-lg mb-20">
           <h1 className="text-5xl font-bold leading-tight mb-6 tracking-tight text-white">
             Domine suas finanças com <span className="text-primary">inteligência</span>.
@@ -141,8 +128,8 @@ export default function AuthPage() {
       {/* --- LADO DIREITO: FORMULÁRIO --- */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 sm:p-12 lg:p-24 bg-background relative">
         
-        {/* Mobile Logo */}
-        <div className="lg:hidden absolute top-6 left-6 flex items-center gap-2">
+        {/* CORREÇÃO: Mobile Logo agora faz parte do fluxo (sem absolute) */}
+        <div className="lg:hidden w-full flex items-center justify-start gap-2 mb-10">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-black">
             <PiggyBank className="w-5 h-5" />
           </div>
@@ -151,7 +138,6 @@ export default function AuthPage() {
 
         <div className="w-full max-w-md flex flex-col gap-8">
           
-          {/* Header Texto */}
           <div className="text-center lg:text-left">
             <h2 className="text-3xl font-bold text-foreground mb-2">
               {mode === 'login' ? 'Bem-vindo de volta!' : 'Crie sua conta'}
@@ -163,7 +149,6 @@ export default function AuthPage() {
             </p>
           </div>
 
-          {/* Abas (Tabs) */}
           <div className="flex p-1 bg-secondary rounded-full w-full">
             <button
               onClick={() => toggleMode('login')}
@@ -189,10 +174,8 @@ export default function AuthPage() {
             </button>
           </div>
 
-          {/* Formulário */}
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
             
-            {/* Campo Nome (Apenas Registro) */}
             {mode === 'register' && (
               <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
                 <label className="text-sm font-medium text-foreground" htmlFor="name">Nome Completo</label>
@@ -205,7 +188,6 @@ export default function AuthPage() {
               </div>
             )}
 
-            {/* Campo E-mail */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="email">E-mail</label>
               <div className="relative">
@@ -227,7 +209,6 @@ export default function AuthPage() {
               {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
             </div>
 
-            {/* Campo Senha */}
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <label className="text-sm font-medium text-foreground" htmlFor="password">Senha</label>
@@ -258,7 +239,6 @@ export default function AuthPage() {
               {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
             </div>
 
-            {/* Botão Submit */}
             <button
               disabled={isLoading}
               type="submit"
